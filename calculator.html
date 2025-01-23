@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transportation Cost Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f9;
+        color: #333;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .tab-container {
+        max-width: 800px;
+        margin: 50px auto;
+        border-radius: 15px;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+        background: #fff5f5;
+        overflow: hidden;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .tabs {
+        display: flex;
+        cursor: pointer;
+        background-color: #f1f1f1;
+        border-bottom: 2px solid #d9534f;
+    }
+
+    .tab {
+        flex: 1;
+        padding: 15px 10px;
+        text-align: center;
+        border-right: 1px solid #e0e0e0;
+        transition: all 0.3s ease-in-out;
+        font-size: 1rem;
+        color: #555;
+    }
+
+    .tab:hover {
+        background-color: #ffdddd;
+        color: #d9534f;
+    }
+
+    .tab:last-child {
+        border-right: none;
+    }
+
+    .tab.active {
+        background-color: #fff;
+        font-weight: bold;
+        color: #d9534f;
+        position: relative;
+    }
+
+    .tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #d9534f, #ff5e5e);
+        border-radius: 2px;
+    }
+
+    @keyframes slide-in {
+        from {
+            width: 0;
+        }
+        to {
+            width: 100%;
+        }
+    }
+
+    .tab-content {
+        display: none;
+        padding: 0px;
+        background-color: #fff;
+        animation: fade-in 0.3s ease-in-out;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+
+    .card {
+        background: #fff5f5;
+        border-radius: 15px;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 12px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .text-danger {
+        color: #d9534f !important;
+    }
+
+    .border-danger {
+        border-color: #d9534f !important;
+    }
+
+    .result-card {
+        font-size: 1.25rem;
+        border: 2px solid #d9534f;
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        text-align: center;
+        border-radius: 10px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .result-card:hover {
+        background-color: #ffebeb;
+        color: #d9534f;
+        transform: translateY(-5px);
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        .tab-container {
+            margin: 20px auto;
+        }
+
+        .tab {
+            font-size: 0.9rem;
+            padding: 10px 5px;
+        }
+
+        .tab-content {
+            padding: 15px;
+        }
+
+        .result-card {
+            font-size: 1rem;
+            padding: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .tab {
+            font-size: 0.8rem;
+            padding: 8px 5px;
+        }
+
+        .result-card {
+            font-size: 0.9rem;
+            padding: 0.75rem;
+        }
+    }
+</style>
+
+</head>
+<body>
+    <div class="tab-container">
+        <div class="tabs">
+            <div class="tab active" onclick="showTabContent(0)">Generic</div>
+            <div class="tab" onclick="showTabContent(1)">Boxes</div>
+            <div class="tab" onclick="showTabContent(2)">Container</div>
+        </div>
+        
+        <!-- Tab 1: Generic -->
+        <div class="tab-content active">
+            <div class="container my-5">
+                <div class="card p-4 shadow-lg border-0">
+                    <h3 class="text-center text-danger mb-4">Generic Calculator</h3>
+                    <form id="generic-form">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="generic-length" class="form-label">Length (cm)</label>
+                                <input type="number" id="generic-length" class="form-control border-danger" placeholder="Enter length" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="generic-width" class="form-label">Width (cm)</label>
+                                <input type="number" id="generic-width" class="form-control border-danger" placeholder="Enter width" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="generic-height" class="form-label">Height (cm)</label>
+                                <input type="number" id="generic-height" class="form-control border-danger" placeholder="Enter height" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="generic-weight" class="form-label">Weight (kg)</label>
+                                <input type="number" id="generic-weight" class="form-control border-danger" placeholder="Enter weight" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="generic-method" class="form-label">Transport Method</label>
+                                <select id="generic-method" class="form-select border-danger" required>
+                                    <option value="" disabled selected>Select Method</option>
+                                    <option value="sea">Sea Freight</option>
+                                    <option value="air">Air Freight</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="generic-goodsType" class="form-label">Goods Type</label>
+                                <select id="generic-goodsType" class="form-select border-danger" required>
+                                    <option value="" disabled selected>Select Goods Type</option>
+                                    <option value="normal">Normal Goods (¥ 650)</option>
+                                    <option value="copy">Copy Goods (¥ 950)</option>
+                                    <option value="liquid">Liquid Goods (¥ 1200)</option>
+                                    <option value="battery">Battery Goods (¥ 1400)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="generic-price" class="form-label">Price (¥)</label>
+                                <input type="number" id="generic-price" class="form-control border-danger" placeholder="Enter price" required>
+                            </div>
+                        </div>
+                        <div id="generic-result" class="result-card bg-light border-danger rounded mt-4">
+                            <h5 class="text-success">Transportation Cost:</h5>
+                            <h3 class="text-danger">Please enter the length.</h3>
+                        </div>
+                        <p></p>
+                        <div class="text-center">
+                            <button type="reset" id="generic-resetButton" class="btn btn-secondary">Reset (Shift+N)</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Boxes -->
+        <div class="tab-content">
+            <div class="container my-5">
+                <div class="card p-4 shadow-lg border-0">
+                    <h3 class="text-center text-danger mb-4">Boxes Calculator</h3>
+                    <form id="boxes-form">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="boxes-length" class="form-label">Length (cm)</label>
+                                <input type="number" id="boxes-length" class="form-control border-danger" placeholder="Enter length" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="boxes-width" class="form-label">Width (cm)</label>
+                                <input type="number" id="boxes-width" class="form-control border-danger" placeholder="Enter width" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="boxes-height" class="form-label">Height (cm)</label>
+                                <input type="number" id="boxes-height" class="form-control border-danger" placeholder="Enter height" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="boxes-weight" class="form-label">Weight (kg)</label>
+                                <input type="number" id="boxes-weight" class="form-control border-danger" placeholder="Enter weight" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="boxes-number" class="form-label">Number of Boxes</label>
+                                <input type="number" id="boxes-number" class="form-control border-danger" placeholder="Enter number of boxes" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="boxes-method" class="form-label">Transport Method</label>
+                                <select id="boxes-method" class="form-select border-danger" required>
+                                    <option value="" disabled selected>Select Method</option>
+                                    <option value="sea">Sea Freight</option>
+                                    <option value="air">Air Freight</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="boxes-goodsType" class="form-label">Goods Type</label>
+                                <select id="boxes-goodsType" class="form-select border-danger" required>
+                                    <option value="" disabled selected>Select Goods Type</option>
+                                    <option value="normal">Normal Goods (¥ 650)</option>
+                                    <option value="copy">Copy Goods (¥ 950)</option>
+                                    <option value="liquid">Liquid Goods (¥ 1200)</option>
+                                    <option value="battery">Battery Goods (¥ 1400)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="boxes-price" class="form-label">Price (¥)</label>
+                                <input type="number" id="boxes-price" class="form-control border-danger" placeholder="Enter price" required>
+                            </div>
+                        </div>
+                        <div id="boxes-result" class="result-card bg-light border-danger rounded mt-4">
+                            <h5 class="text-success">Transportation Cost:</h5>
+                            <h3 class="text-danger">Please enter the length.</h3>
+                        </div>
+                        <p></p>
+                        <div class="text-center">
+                            <button type="reset" id="boxes-resetButton" class="btn btn-secondary">Reset (Shift+N)</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Container -->
+        <div class="tab-content">
+            <div class="container my-5">
+                <div class="card p-4 shadow-lg border-0">
+                    <h3 class="text-center text-danger mb-4">Container Calculator</h3>
+                    <form id="container-form">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="container-type" class="form-label">Container Type</label>
+                                <select id="container-type" class="form-select border-danger" required>
+                                    <option value="" disabled selected>Select Container Type</option>
+                                    <option value="20ft">20 ft Container</option>
+                                    <option value="40ft">40 ft Container</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="container-number" class="form-label">Number of Containers</label>
+                                <input type="number" id="container-number" class="form-control border-danger" placeholder="Enter number of containers" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="container-goodsType" class="form-label">Goods Type</label>
+                                <select id="container-goodsType" class="form-select border-danger" required>
+                                    <option value="" disabled selected>Select Goods Type</option>
+                                    <option value="normal">Normal Goods (¥ 650)</option>
+                                    <option value="copy">Copy Goods (¥ 950)</option>
+                                    <option value="liquid">Liquid Goods (¥ 1200)</option>
+                                    <option value="battery">Battery Goods (¥ 1400)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="container-price" class="form-label">Price (¥)</label>
+                                <input type="number" id="container-price" class="form-control border-danger" placeholder="Enter price" required>
+                            </div>
+                        </div>
+                        <div id="container-result" class="result-card bg-light border-danger rounded mt-4">
+                            <h5 class="text-success">Transportation Cost:</h5>
+                            <h3 class="text-danger">Please select a container type.</h3>
+                        </div>
+                        <p></p>
+                        <div class="text-center">
+                            <button type="reset" id="container-resetButton" class="btn btn-secondary">Reset (Shift+N)</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTabContent(index) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+
+            tabs[index].classList.add('active');
+            contents[index].classList.add('active');
+        }
+        
+        
+        
+
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const rates = {
+            sea: {
+                normal: 650,
+                copy: 950,
+                liquid: 1200,
+                battery: 1400
+            },
+            air: {
+                normal: 650,
+                copy: 950,
+                liquid: 1200,
+                battery: 1400
+            }
+        };
+
+        const containerRates = {
+            "20ft": 33, // 20 ft container CBM
+            "40ft": 67 // 40 ft container CBM
+        };
+
+        const clearance = 150; // constant clearance in ¥
+        const fee = 0.02; // constant fee in ¥
+
+        const genericForm = document.getElementById('generic-form');
+        const boxesForm = document.getElementById('boxes-form');
+        const containerForm = document.getElementById('container-form');
+
+        const genericResult = document.getElementById('generic-result');
+        const boxesResult = document.getElementById('boxes-result');
+        const containerResult = document.getElementById('container-result');
+
+        function displayError(resultElement, message) {
+            resultElement.innerHTML = `
+                <h5 class="text-success">Transportation Cost:</h5>
+                <h3 class="text-danger">${message}</h3>
+            `;
+        }
+
+        function focusFirstField() {
+            const activeTab = document.querySelector('.tab-content.active form');
+            if (activeTab) {
+                const firstField = activeTab.querySelector('input, select');
+                if (firstField) firstField.focus();
+            }
+        }
+		   
+        function displayError(resultElement, message) {
+            resultElement.innerHTML = `
+                <h5 class="text-success">Transportation Cost:</h5>
+                <h3 class="text-danger">${message}</h3>
+            `;
+        }
+
+        function displayFirstMessage(form) {
+            const resultElement = form.querySelector('.result-card');
+
+            if (form.id === 'generic-form') {
+                displayError(resultElement, "Please enter the length.");
+            } else if (form.id === 'boxes-form') {
+                displayError(resultElement, "Please enter the length.");
+            } else if (form.id === 'container-form') {
+                displayError(resultElement, "Please select a container type.");
+            }
+        }
+
+        
+        function setFirstFieldFocus(form) {
+            const firstField = form.querySelector('input, select');
+            if (firstField) {
+                firstField.focus();
+            }
+        }
+        
+        
+        const resetButtons = document.querySelectorAll('button[type="reset"]');
+        resetButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const parentForm = button.closest('form');
+                const resultCard = parentForm.querySelector('.result-card');
+                resultCard.innerHTML = '';
+                setFirstFieldFocus(parentForm); 
+                displayFirstMessage(parentForm);
+                
+            });
+        });
+
+        
+        document.addEventListener('keydown', (event) => {
+            if (event.shiftKey && event.key === 'N') {
+                const activeForm = document.querySelector('.tab-content.active form');
+                const resetButton = activeForm.querySelector('button[type="reset"]');
+                resetButton.click();
+            }
+        });
+
+        
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                setTimeout(focusFirstField, 30); 
+            });
+        });
+
+        
+        focusFirstField();
+
+        
+        function calculateCost({ cbm, weight, method, goodsType, price }) {
+            const rate = rates[method][goodsType];
+            const volumetricWeight = cbm * 166.67; 
+            const transportCharge =
+                method === "air"
+                    ? Math.max(weight / 1000, volumetricWeight) * rate
+                    : Math.max(weight / 1000, cbm) * rate;
+
+            return transportCharge + clearance + fee * price;
+        }
+
+        function calculateContainerCost({ cbm, numberOfContainers, goodsType, price }) {
+            const rate = rates.sea[goodsType];
+            const totalCBM = cbm * numberOfContainers;
+
+            return totalCBM * rate + clearance + fee * price;
+        }
+
+        
+        genericForm.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('input', () => {
+                const length = parseFloat(document.getElementById('generic-length').value) || 0;
+                const width = parseFloat(document.getElementById('generic-width').value) || 0;
+                const height = parseFloat(document.getElementById('generic-height').value) || 0;
+                const weight = parseFloat(document.getElementById('generic-weight').value) || 0;
+                const method = document.getElementById('generic-method').value;
+                const goodsType = document.getElementById('generic-goodsType').value;
+                const price = parseFloat(document.getElementById('generic-price').value) || 0;
+
+                if (!length) return displayError(genericResult, "Please enter the length.");
+                if (!width) return displayError(genericResult, "Please enter the width.");
+                if (!height) return displayError(genericResult, "Please enter the height.");
+                if (!weight) return displayError(genericResult, "Please enter the weight.");
+                if (!method) return displayError(genericResult, "Please select a transport method.");
+                if (!goodsType) return displayError(genericResult, "Please select a goods type.");
+                if (!price) return displayError(genericResult, "Please enter the price.");
+
+                const cbm = (length * width * height) / 1000000;
+                const cost = calculateCost({ cbm, weight, method, goodsType, price });
+                genericResult.innerHTML = `<h5 class="text-success">Transportation Cost:</h5>
+                    <h3 class="text-danger">¥ ${cost.toFixed(2)}</h3>`;
+            });
+        });
+
+        
+        boxesForm.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('input', () => {
+                const length = parseFloat(document.getElementById('boxes-length').value) || 0;
+                const width = parseFloat(document.getElementById('boxes-width').value) || 0;
+                const height = parseFloat(document.getElementById('boxes-height').value) || 0;
+                const weight = parseFloat(document.getElementById('boxes-weight').value) || 0;
+                const numberOfBoxes = parseInt(document.getElementById('boxes-number').value) || 0;
+                const method = document.getElementById('boxes-method').value;
+                const goodsType = document.getElementById('boxes-goodsType').value;
+                const price = parseFloat(document.getElementById('boxes-price').value) || 0;
+
+                if (!length) return displayError(boxesResult, "Please enter the length.");
+                if (!width) return displayError(boxesResult, "Please enter the width.");
+                if (!height) return displayError(boxesResult, "Please enter the height.");
+                if (!weight) return displayError(boxesResult, "Please enter the weight.");
+                if (!numberOfBoxes) return displayError(boxesResult, "Please enter the number of boxes.");
+                if (!method) return displayError(boxesResult, "Please select a transport method.");
+                if (!goodsType) return displayError(boxesResult, "Please select a goods type.");
+                if (!price) return displayError(boxesResult, "Please enter the price.");
+
+                const cbmPerBox = (length * width * height) / 1000000;
+                const totalCBM = cbmPerBox * numberOfBoxes;
+                const totalWeight = weight * numberOfBoxes;
+                const cost = calculateCost({ cbm: totalCBM, weight: totalWeight, method, goodsType, price });
+                boxesResult.innerHTML = `<h5 class="text-success">Transportation Cost:</h5>
+                    <h3 class="text-danger">¥ ${cost.toFixed(2)}</h3>`;
+            });
+        });
+
+        
+        containerForm.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('input', () => {
+                const containerType = document.getElementById('container-type').value;
+                const numberOfContainers = parseInt(document.getElementById('container-number').value) || 0;
+                const goodsType = document.getElementById('container-goodsType').value;
+                const price = parseFloat(document.getElementById('container-price').value) || 0;
+
+                if (!containerType) return displayError(containerResult, "Please select a container type.");
+                if (!numberOfContainers) return displayError(containerResult, "Please enter the number of containers.");
+                if (!goodsType) return displayError(containerResult, "Please select a goods type.");
+                if (!price) return displayError(containerResult, "Please enter the price.");
+
+                const cbm = containerRates[containerType];
+                const cost = calculateContainerCost({ cbm, numberOfContainers, goodsType, price });
+                containerResult.innerHTML = `<h5 class="text-success">Transportation Cost:</h5>
+                    <h3 class="text-danger">¥ ${cost.toFixed(2)}</h3>`;
+            });
+        });
+
+        
+        focusFirstField();
+    });
+</script>
+
+</html>
